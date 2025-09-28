@@ -8,7 +8,7 @@ import { revalidatePath } from "next/cache"
 
 type CourseState = {
     success: boolean
-    error?: string
+    error?: string | z.ZodIssue[]
 }
 
 export async function createCourse(prevState: CourseState, formData: FormData): Promise<CourseState> {
@@ -34,7 +34,7 @@ export async function createCourse(prevState: CourseState, formData: FormData): 
     } catch (error: unknown) {
         if(error instanceof z.ZodError) {
             console.log('Error occured', error.issues)
-            return { success: false, error: (error as any).issues }
+            return { success: false, error: JSON.stringify(error.issues)}
         }
         console.log('Error occured', (error as Error).message)
         return { success: false, error: "Error in adding course to database"}
@@ -91,7 +91,7 @@ export async function completeCourse(
     } catch (error: unknown) {
         if(error instanceof(z.ZodError)) {
             console.log('Error occured', error.issues)
-            return { success: false, error: (error as any).issues }   
+            return { success: false, error: JSON.stringify(error.issues) }   
         }
 
         return { success: false, error: "Error in completing course"}
