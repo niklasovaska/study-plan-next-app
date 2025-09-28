@@ -16,12 +16,11 @@ import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { useActionState, useState, useEffect } from "react"
 import { createCourse } from "@/lib/actions"
-import { UpcomingCourse } from "@/types/course.types"
-import { useCourseContext } from "@/context/CourseContext"
+import {  useQueryClient } from "@tanstack/react-query"
 
 
 const AddCourseModal = () => {
-  const { setCourses } = useCourseContext()
+  const queryClient = useQueryClient()
   const [open, setOpen] = useState(false)
 
   const [state, formAction, isPending] = useActionState(
@@ -29,15 +28,12 @@ const AddCourseModal = () => {
     { success: false })
 
   useEffect(() => {
-    if (state.success) {
-      console.log(state.data)
-      if(state.data) {
-        setCourses(state.data.courses)
-      }
+      if(state.success) {
+      queryClient.invalidateQueries({ queryKey: ["upcoming"] })
       setOpen(false)
       toast.success('Course successfully added')
     }
-  }, [state.success])
+    }, [state.success])
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -75,7 +71,7 @@ const AddCourseModal = () => {
               </div>
             </div>
 
-            <DialogFooter className="mt-2">
+            <DialogFooter className="mt-4">
               <DialogClose asChild>
                 <Button variant="outline">Cancel</Button>
               </DialogClose>
@@ -87,7 +83,11 @@ const AddCourseModal = () => {
             </DialogFooter>
           </form>
           {state.error && (
-              <p className="text-red-500 text-sm">{state.error}</p>
+            <div className="text-red-500 text-sm">
+                {Array.isArray(state.error)
+                    ? state.error.map((err, i) => <div key={i}>{err.message}</div>)
+                    : state.error}
+            </div>
           )}
         </DialogContent>
     </Dialog>
