@@ -1,15 +1,16 @@
+"use client"
+
 import UpcomingCourseBoard from "@/components/features/UpcomingCoursesBoard"
-import { getUpcomingCourses } from "@/lib/api/getUpcomingCourses"
-import { CourseProvider } from "@/context/CourseContext"
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 
-const UpcomingCourses = async () => {
+const queryClient = new QueryClient()
 
-  const courses = await getUpcomingCourses()
+const UpcomingCourses = () => {
 
   return(
-    <CourseProvider>
-      <UpcomingCourseBoard initialCourses={courses.courses}/>
-    </CourseProvider>
+    <QueryClientProvider client={queryClient}>
+      <UpcomingCourseBoard />
+    </QueryClientProvider>
   )
 }
 

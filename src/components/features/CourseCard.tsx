@@ -3,16 +3,16 @@
 import { CourseCardProps } from "@/types/course.types"
 import { useDraggable } from "@dnd-kit/core"
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card"
-import { MoreHorizontal, Check, Trash2, Grip, ChevronDown } from "lucide-react"
+import { Check, Trash2, Grip, ChevronDown } from "lucide-react"
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import CompleteCourseDialog from "./CompleteCourseDialog"
+import DeleteCourseDialog from "./DeleteCourseDialog"
 import { useState } from "react"
 import { cn } from "@/lib/utils"
 
@@ -27,7 +27,8 @@ const CourseCard = ({ course }: CourseCardProps) => {
     } : undefined
 
 
-    const [open, setOpen] = useState(false)
+    const [completeOpen, setCompleteOpen] = useState(false)
+    const [deleteOpen, setDeleteOpen] = useState(false)
 
     return(
         <Card
@@ -50,7 +51,7 @@ const CourseCard = ({ course }: CourseCardProps) => {
                         <DropdownMenuItem 
                             onClick={(e) => {
                                 e.stopPropagation()
-                                setOpen(true)
+                                setCompleteOpen(true)
                             }}
                         >
                             Complete
@@ -61,7 +62,7 @@ const CourseCard = ({ course }: CourseCardProps) => {
                         <DropdownMenuItem
                             onClick={(e) => {
                                 e.stopPropagation()
-                                console.log('clicked')
+                                setDeleteOpen(true)
                             }}
                         >
                             Delete
@@ -76,10 +77,16 @@ const CourseCard = ({ course }: CourseCardProps) => {
                     {course.credits} credits
                 </div>
                 <CompleteCourseDialog
-                id={course._id}
-                name={course.name}
-                open={open}
-                setOpen={setOpen}
+                    id={course._id}
+                    name={course.name}
+                    open={completeOpen}
+                    setOpen={setCompleteOpen}
+                />
+                <DeleteCourseDialog 
+                    id={course._id}
+                    name={course.name}
+                    open={deleteOpen}
+                    setOpen={setDeleteOpen}
                 />
                 <Grip {...listeners} className="cursor-grab"/>
             </CardContent>
