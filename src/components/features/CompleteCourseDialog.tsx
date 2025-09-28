@@ -62,7 +62,11 @@ const CompleteCourseDialog = ({ id, name, open, setOpen }: DialogProps) => {
                     </DialogFooter>
                 </form>
                 {state.error && (
-                <p className="text-red-500 text-sm">{state.error}</p>
+                <div className="text-red-500 text-sm">
+                {Array.isArray(state.error)
+                    ? state.error[0]?.message
+                    : state.error}
+            </div>
                 )}
             </DialogContent>
         </Dialog>

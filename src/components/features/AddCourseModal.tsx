@@ -85,7 +85,7 @@ const AddCourseModal = () => {
           {state.error && (
             <div className="text-red-500 text-sm">
                 {Array.isArray(state.error)
-                    ? state.error.map((err, i) => <div key={i}>{err.message}</div>)
+                    ? state.error[0]?.message
                     : state.error}
             </div>
           )}
