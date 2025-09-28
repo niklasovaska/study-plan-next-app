@@ -53,3 +53,10 @@ export type SemesterColumnProps = {
     column: SemesterColumnType
     courses: UpcomingCourse[]
 }
+
+export type DialogProps = {
+    id: string
+    name: string
+    open: boolean
+    setOpen: (open: boolean) => void
+}
