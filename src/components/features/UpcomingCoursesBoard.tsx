@@ -1,6 +1,6 @@
 "use client"
 
-import { UpcomingCourse, CourseBoardProps } from "@/types/course.types"
+import { UpcomingCourse } from "@/types/course.types"
 import SemesterColumn from "@/components/features/SemesterColumn"
 import AddCourseModal from "@/components/features/AddCourseModal"
 import { DndContext, DragEndEvent } from "@dnd-kit/core"

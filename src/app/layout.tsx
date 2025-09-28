@@ -3,7 +3,6 @@ import { Montserrat, Merriweather, Ubuntu_Mono } from "next/font/google";
 import "../styles/globals.css";
 import Header from "@/components/layout/Header";
 import { ThemeProvider } from "@/components/layout/ThemeProvider";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/sonner"
 
 const montserrat = Montserrat({
