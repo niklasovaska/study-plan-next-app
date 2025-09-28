@@ -1,4 +1,6 @@
 import mongoose from "mongoose";
+import { Courses } from "@/types/course.types";
+import Course from "@/models/Course";
 
 let isConnected = false;
 
@@ -12,7 +14,7 @@ const connectToDatabase = async () => {
         }
         await mongoose.connect(mongoUrl);
         isConnected = true;
-        
+
     } catch (error: unknown) {
         if(error instanceof Error) {
            throw new Error('error connecting to MongoDB' + error.message) 
@@ -21,3 +23,15 @@ const connectToDatabase = async () => {
 }
 
 export default connectToDatabase
+
+
+export async function getCoursesFromDb(): Promise<Courses> {
+    try {
+        await connectToDatabase();
+        const courses = await Course.find();
+        return { courses };
+    } catch (error) {
+        console.error("Error fetching courses:", error);
+        throw new Error("Error fetching courses from database");
+    }
+}

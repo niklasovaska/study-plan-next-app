@@ -5,7 +5,7 @@ import StatsBox from "@/components/features/StatsBox";
 export default async function Home() {
   const courses = await getAllCourses()
   
-  const completedCourses = courses.courses?.filter(c => 'grade' in c)
+  const completedCourses = courses.courses?.filter(c => c.grade)
 
   return (
     <div className="flex flex-col items-center p-10">
