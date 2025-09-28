@@ -1,6 +1,5 @@
 "use client"
 
-import { useEffect, useState } from "react"
 import { UpcomingCourse, CourseBoardProps } from "@/types/course.types"
 import SemesterColumn from "@/components/features/SemesterColumn"
 import AddCourseModal from "@/components/features/AddCourseModal"
@@ -8,21 +7,35 @@ import { DndContext, DragEndEvent } from "@dnd-kit/core"
 import { toast } from "sonner"
 import { updateCourseStatus } from "@/lib/actions"
 import { getUpcomingCourses } from "@/lib/api/getUpcomingCourses"
-import { useCourseContext } from "@/context/CourseContext"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import LoadingCourseBoard from "../layout/LoadingCourseBoard"
+import ErrorPage from "./ErrorPage"
 
 const SEMESTER_COLUMNS = [
-    { id: 'upcoming', title: 'Upcoming' },
+    { id: 'upcoming', title: 'Not scheduled' },
     { id: 'A25', title: 'Autumn 2025' },
     { id: 'S26', title: 'Spring 2026' },
 ]
 
-const UpcomingCourseBoard = ({ initialCourses }: CourseBoardProps) => {
+const UpcomingCourseBoard = () => {
+    const queryClient = useQueryClient()
 
-    const { courses, setCourses } = useCourseContext()
+    const { data, isLoading, error } = useQuery({
+        queryKey: ["upcoming"],
+        queryFn: getUpcomingCourses
+    })
 
-    useEffect(() => {
-        setCourses(initialCourses)
-    }, [initialCourses, setCourses])
+    const statusMutation = useMutation({
+        mutationFn: async({ id, newStatus }: { id: string, newStatus: string}) =>
+            await updateCourseStatus(id, newStatus),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["upcoming"] })
+            toast.success('Course rescheduled')
+        },
+        onError: () => {
+            toast.error('Error scheduling course')
+        }
+    })
 
     async function handleDragEnd(e: DragEndEvent) {
         const { active, over } = e
@@ -35,33 +48,23 @@ const UpcomingCourseBoard = ({ initialCourses }: CourseBoardProps) => {
 
         if(activeColumnId === newStatus) return
 
-        setCourses(
-            courses.map(c => 
-                c._id === courseId ? { ...c, status: newStatus, } : c
-            )
-        )
-
-        const courseUpdate = await updateCourseStatus(courseId, newStatus)
-
-        if(courseUpdate) {
-            const latestData = await getUpcomingCourses()
-            setCourses(latestData.courses)
-            toast.success('Course rescheduled')
-        } else {
-            toast.error('Error scheduling course')
-        }
+        statusMutation.mutate({ id: courseId, newStatus: newStatus })
     }
+
+    if (isLoading) return <LoadingCourseBoard />
+
+    if (error) return <ErrorPage />
 
     return(
         <div className="flex flex-col items-center p-4 mt-10">
             <AddCourseModal />
-            <div className="flex gap-10">
+            <div className="flex gap-10 mt-10">
                 <DndContext onDragEnd={handleDragEnd}>
                     {SEMESTER_COLUMNS.map((c) => (
                     <SemesterColumn
                         key={c.id}
                         column={c}
-                        courses={courses.filter(course => course.status === c.id)}
+                        courses={(data?.courses ?? []).filter(course => course.status === c.id)}
                     />
                 ))}
                 </DndContext>
